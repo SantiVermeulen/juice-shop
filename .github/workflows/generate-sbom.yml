@@ -18,15 +18,14 @@ jobs:
         with:
           node-version: "20" # Juice Shop vereist een recente Node versie (check package.json engines)
 
-      - name: Install dependencies
+      - name: Install project dependencies
         run: npm install --legacy-peer-deps # --legacy-peer-deps kan nodig zijn voor Juice Shop
 
-      - name: Install CycloneDX CLI
-        run: npm install -g @cyclonedx/bom
+      # De aparte 'Install CycloneDX CLI' stap is niet meer nodig als we npx gebruiken zoals hieronder
 
-      - name: Generate CycloneDX SBOM (JSON)
+      - name: Generate CycloneDX SBOM (JSON) using npx
         run: |
-          cyclonedx-bom --output-format JSON --output-file bom.json
+          npx --yes @cyclonedx/bom@latest --output-format JSON --output-file bom.json
           echo "SBOM generated: bom.json"
 
       - name: Upload SBOM artifact
