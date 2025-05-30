@@ -1,0 +1,37 @@
+name: Generate CycloneDX SBOM
+
+on:
+  push:
+    branches: [master, main] # Trigger op push naar master of main
+  workflow_dispatch: # Sta manuele trigger toe
+
+jobs:
+  build-and-generate-sbom:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # Juice Shop vereist een recente Node versie (check package.json engines)
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps # --legacy-peer-deps kan nodig zijn voor Juice Shop
+
+      - name: Install CycloneDX CLI
+        run: npm install -g @cyclonedx/bom
+
+      - name: Generate CycloneDX SBOM (JSON)
+        run: |
+          cyclonedx-bom --output-format JSON --output-file bom.json
+          echo "SBOM generated: bom.json"
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cyclonedx-sbom-json
+          path: bom.json
+          if-no-files-found: error # Fail als bom.json niet gevonden wordt
