@@ -18,19 +18,14 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Install CycloneDX NPM tool
+        run: npm install --save-dev @cyclonedx/cyclonedx-npm
+
       - name: Install project dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Install CycloneDX CLI globally
-        run: npm install -g @cyclonedx/bom
-
       - name: Generate CycloneDX SBOM (JSON)
-        run: |
-          # Gebruik het volledige pad naar de executable
-          $(npm bin -g)/cyclonedx-bom --output-format JSON --output-file bom.json
-          echo "SBOM generated: bom.json"
-          echo "Listing files in current directory:"
-          ls -la # Om te controleren of bom.json is aangemaakt
+        run: npx @cyclonedx/cyclonedx-npm --output-format JSON --output-file bom.json
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
